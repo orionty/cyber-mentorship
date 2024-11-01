@@ -1,5 +1,4 @@
 import Mux from "@mux/mux-node"
-import { auth } from "@clerk/nextjs"
 import axios from "axios"
 import { NextResponse } from "next/server"
 
@@ -10,7 +9,10 @@ const { Video } = new Mux(
 
 export async function DELETE(req:Request, { params } : { params: { courseId: string, chapterId: string}}) {
     try {
-        const { userId } = auth()
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        const userId = user?._id;
+        
         if(!userId){
             return new NextResponse("Unauthorized access denied", {status: 401})
         }
@@ -42,7 +44,10 @@ export async function PATCH(req: Request, { params } : { params : { courseId: st
     try {
 
 
-        const {userId} = auth()
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        const userId = user?._id;
+        
         if(!userId){
             return new NextResponse("Unauthorized access denied", { status: 401})
         }

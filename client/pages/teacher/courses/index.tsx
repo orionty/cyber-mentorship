@@ -1,7 +1,6 @@
-'use client';
-
-import { DataTable } from "./_components/data-table";
-import { columns } from "./_components/columns";
+"use client"
+import { DataTable } from "../../../components/teacher/courses/data-table";
+import { columns } from "../../../components/teacher/courses/columns";
 import { useRouter } from "next/router"; // Changed from next/navigation
 import axios from "axios";
 import { useEffect, useState } from "react";

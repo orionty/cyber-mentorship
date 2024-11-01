@@ -1,24 +1,27 @@
+"use client"
 import { IconBadge } from "@/components/icon-bage";
-import { auth } from "@clerk/nextjs";
 import axios from "axios";
 import { ArrowLeft, Eye, LayoutDashboard, Video } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import ChapterTitleForm from "./_components/chapter-title-form";
-import ChapterDescriptionForm from "./_components/chapter-description-form";
-import ChapterAccessForm from "./_components/chapter-access-form";
-import ChapterVideoForm from "./_components/chapter-video-form";
+import ChapterTitleForm from "../../../../../../components/teacher/chapters/chapter-title-form";
+import ChapterDescriptionForm from "../../../../../../components/teacher/chapters/chapter-description-form";
+import ChapterAccessForm from "../../../../../../components/teacher/chapters/chapter-access-form";
+import ChapterVideoForm from "../../../../../../components/teacher/chapters/chapter-video-form";
 import { Banner } from "@/components/banner";
-import { ChapterActions } from "./_components/chapter-actions";
+import { ChapterActions } from "@/components/teacher/chapters/chapter-actions";
 
 const ChapterIdPage = async ({
   params,
 }: {
   params: { courseId: string; chapterId: string };
 }) => {
-  const { userId } = auth();
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        const userId = user?._id;
+        
   if (!userId) {
-    return redirect("/dashboard");
+    return redirect("/login");
   }
 
   const chapter = await (

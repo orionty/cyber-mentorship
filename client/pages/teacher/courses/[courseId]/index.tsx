@@ -4,14 +4,14 @@ import { IconBadge } from "@/components/icon-bage";
 import { Banner } from "../../../../components/banner";
 import { CircleDollarSign, File, LayoutDashboard, ListChecks } from "lucide-react";
 import { redirect } from "next/navigation";
-import { Actions } from "./_components/actions";
-import TitleForm from "./_components/title-form";
-import DescriptionForm from "./_components/description-form";
-import ImageForm from "./_components/image-form";
-import CategoryForm from "./_components/category-form";
-import ChapterForm from "./_components/chpater-form";
-import PriceForm from "./_components/price-form";
-import AttachmentsForm from "./_components/attachments-form";
+import { Actions } from "../../../../components/teacher/courses/actions";
+import TitleForm from "../../../../components/teacher/courses/title-form";
+import DescriptionForm from "../../../../components/teacher/courses/description-form";
+import ImageForm from "../../../../components/teacher/courses/image-form";
+import CategoryForm from "../../../../components/teacher/courses/category-form";
+import ChapterForm from "../../../../components/teacher/courses/chpater-form";
+import PriceForm from "../../../../components/teacher/courses/price-form";
+import AttachmentsForm from "../../../../components/teacher/courses/attachments-form";
 
 
 const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {

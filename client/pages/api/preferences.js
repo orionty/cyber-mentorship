@@ -1,6 +1,6 @@
-import dbConnect from '../../../lib/dbConnect';
-import User from '../../../models/User';
-import { verifyToken } from '../../../utils/auth';
+import dbConnect from '../../lib/dbConnect';
+import User from '../../models/User';
+import { verifyToken } from '../../utils/tokens';
 
 export default async function handler(req, res) {
   if (req.method !== 'PUT') {

@@ -1,5 +1,4 @@
 import { stripe } from "@/lib/stripe";
-import { currentUser } from "@clerk/nextjs";
 import axios from "axios";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -9,10 +8,13 @@ export async function POST(
   { params }: { params: { courseId: string } }
 ) {
   try {
-    const user = await currentUser();
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    const userId = user?._id;
+    const email = user?.email;
 
-    if (!user || !user.id || !user.emailAddresses?.[0]?.emailAddress) {
-      return new NextResponse("Unauthorized access denied at chekout", {
+    if (!userId || !email) {
+      return new NextResponse("Unauthorized access denied at checkout", {
         status: 401,
       });
     }
@@ -24,7 +26,7 @@ export async function POST(
       return new NextResponse("No Course Found!", { status: 404 });
     }
 
-    const purchased = !!course.purchased[user.id];
+    const purchased = !!course.purchased[userId];
     if (purchased) {
       return new NextResponse("Already purchased", { status: 400 });
     }
@@ -44,18 +46,18 @@ export async function POST(
     ];
 
     let stripeCustomer: { stripeCustomerId: string } = (
-      await axios.get(`${process.env.BACK_END_URL}/api/stripeCustomers/${user.id}`)
+      await axios.get(`${process.env.BACK_END_URL}/api/stripeCustomers/${userId}`)
     ).data;
 
     if (!stripeCustomer) {
       const customer = await stripe.customers.create({
-        email: user.emailAddresses[0].emailAddress,
+        email: email,
       });
 
       stripeCustomer = (
         await axios.post(`${process.env.BACK_END_URL}/api/stripeCustomers`, {
-          email: user.emailAddresses[0].emailAddress,
-          userId: user.id,
+          email: email,
+          userId: userId,
           stripeCustomerId: customer.id,
         })
       ).data;
@@ -69,7 +71,7 @@ export async function POST(
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/courses/${course._id}?canceled=1`,
       metadata: {
         courseId: course._id,
-        userId: user.id,
+        userId: userId,
       },
     });
 

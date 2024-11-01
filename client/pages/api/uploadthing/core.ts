@@ -1,10 +1,12 @@
-import { auth } from "@clerk/nextjs";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 
 const f = createUploadthing();
 
 const handleAuth = async () => {
-  const { userId } = await auth();
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        const userId = user?._id;
+        
 
   if (!userId) {
     throw new Error("Unauthorized user detected!");}

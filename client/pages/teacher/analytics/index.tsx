@@ -1,13 +1,16 @@
+"use client"
 import { getAnalytics } from "@/actions/get-analytics";
-import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
-import { DataCard } from "./_components/data-card";
-import { Chart } from "./_components/chart";
+import { DataCard } from "../../../components/teacher/analytics/data-card";
+import { Chart } from "../../../components/teacher/analytics/chart";
 
 const AnalyticsPage = async () => {
-  const { userId } = auth();
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    const userId = user?._id;
+        
   if (!userId) {
-    return redirect("/dashboard");
+    return redirect("/login");
   }
 
   const { data, totalRevenue, totalSales } = await getAnalytics(userId);

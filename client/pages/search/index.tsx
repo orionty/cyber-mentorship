@@ -1,10 +1,10 @@
+"use client"
 import axios from "axios";
-import { Categories } from "./_components/categories";
-import { SearchInput } from "@/components/search-input";
-import { auth } from "@clerk/nextjs";
+import { Categories } from "../../components/search/categories";
 import { redirect } from "next/navigation";
 import { getCourses } from "@/actions/get-courses";
 import { CoursesList } from "@/components/courses-list";
+import { SearchInput } from "@/components/search-input";
 
 interface searchPageProps{
   searchParams: { 
@@ -16,9 +16,12 @@ interface searchPageProps{
 const SearchPage = async ({ searchParams } : searchPageProps) => {
 
 
-  const { userId } = auth()
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const userId = user?._id;
+  
   if(!userId){
-    return redirect("/dashboard")
+    return redirect("/login")
   }
 
   const categories = await (

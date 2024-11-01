@@ -1,14 +1,15 @@
 "use client";
 
 import Link from 'next/link'
-import { UserButton, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { useState, useEffect } from 'react';
 import { Menu, X, BookOpen, Users, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import { motion, useScroll, useSpring } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export const Navbar = () => {
-  const { isSignedIn } = useUser();
+  const router = useRouter();
+  const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { scrollYProgress } = useScroll();
@@ -17,6 +18,13 @@ export const Navbar = () => {
     damping: 30,
     restDelta: 0.001
   });
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      setUser(JSON.parse(userStr));
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,6 +39,12 @@ export const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+    router.push('/');
+  };
 
   return (
     <>
@@ -57,25 +71,30 @@ export const Navbar = () => {
                 <MessageCircle className="w-5 h-5 mr-1" />
                 Contact
               </Link>
-              {isSignedIn ? (
+              {user ? (
                 <>
                   <Link href="/dashboard" className="text-amber-800 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium transition duration-300 ease-in-out">
                     Dashboard
                   </Link>
-                  <UserButton afterSignOutUrl="/" />
+                  <button
+                    onClick={handleLogout}
+                    className="text-amber-800 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium transition duration-300 ease-in-out"
+                  >
+                    Logout
+                  </button>
                 </>
               ) : (
                 <>
-                  <SignInButton mode="modal">
+                  <Link href="/login">
                     <button className="text-amber-800 hover:text-amber-600 px-4 py-2 rounded-md text-sm font-medium transition duration-300 ease-in-out border border-amber-600 hover:bg-amber-600 hover:text-white">
                       Log in
                     </button>
-                  </SignInButton>
-                  <SignUpButton mode="modal">
+                  </Link>
+                  <Link href="/register">
                     <button className="bg-amber-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-amber-700 transition duration-300 ease-in-out transform hover:scale-105">
                       Sign up
                     </button>
-                  </SignUpButton>
+                  </Link>
                 </>
               )}
             </div>
@@ -109,27 +128,30 @@ export const Navbar = () => {
                 <MessageCircle className="w-5 h-5 inline-block mr-2" />
                 Contact
               </Link>
-              {isSignedIn ? (
+              {user ? (
                 <>
                   <Link href="/dashboard" className="text-amber-800 hover:bg-amber-200 block px-3 py-2 rounded-md text-base font-medium transition duration-300 ease-in-out">
                     Dashboard
                   </Link>
-                  <div className="px-3 py-2">
-                    <UserButton afterSignOutUrl="/" />
-                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="text-amber-800 hover:bg-amber-200 block w-full text-left px-3 py-2 rounded-md text-base font-medium transition duration-300 ease-in-out"
+                  >
+                    Logout
+                  </button>
                 </>
               ) : (
                 <>
-                  <SignInButton mode="modal">
+                  <Link href="/login">
                     <button className="text-amber-800 hover:bg-amber-200 block w-full text-left px-3 py-2 rounded-md text-base font-medium transition duration-300 ease-in-out">
                       Log in
                     </button>
-                  </SignInButton>
-                  <SignUpButton mode="modal">
+                  </Link>
+                  <Link href="/register">
                     <button className="bg-amber-600 text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-amber-700 transition duration-300 ease-in-out">
                       Sign up
                     </button>
-                  </SignUpButton>
+                  </Link>
                 </>
               )}
             </div>
