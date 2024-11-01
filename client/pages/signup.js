@@ -19,6 +19,8 @@ import {
   import { useState } from 'react';
   import { FaGoogle, FaEye, FaEyeSlash, FaHome } from 'react-icons/fa';
   import { useRouter } from 'next/router';
+  import { useToast } from '@chakra-ui/react';
+
   
   const MotionBox = motion(Box);
   const MotionFlex = motion(Flex);
@@ -37,6 +39,8 @@ import {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const toast = useToast();
   
     const bgColor = useColorModeValue('white', 'gray.800');
     const textColor = useColorModeValue('gray.600', 'gray.200');
@@ -47,6 +51,106 @@ import {
       onSuccess: (response) => console.log('Google signup success:', response),
       onError: () => console.log('Google signup error'),
     });
+
+    const handleSignUp = async (e) => {
+      e.preventDefault();
+      
+      // Validation
+      if (!firstName || !lastName || !email || !password || !confirmPassword) {
+        toast({
+          title: 'Error',
+          description: 'All fields are required',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+    
+      if (password !== confirmPassword) {
+        toast({
+          title: 'Error',
+          description: 'Passwords do not match',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+    
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        toast({
+          title: 'Error',
+          description: 'Please enter a valid email address',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+    
+      // Password validation (at least 8 characters, one uppercase, one lowercase, one number)
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+      if (!passwordRegex.test(password)) {
+        toast({
+          title: 'Error',
+          description: 'Password must be at least 8 characters long and contain uppercase, lowercase and numbers',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+    
+      setIsLoading(true);
+    
+      try {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            firstName,
+            lastName,
+            email,
+            password,
+          }),
+        });
+    
+        const data = await response.json();
+    
+        if (!response.ok) {
+          throw new Error(data.message || 'Something went wrong');
+        }
+    
+        toast({
+          title: 'Success',
+          description: 'Account created successfully',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+    
+        // Optional: Store user data in local storage or context
+        localStorage.setItem('user', JSON.stringify(data.user));
+    
+        // Redirect to login page
+        router.push('/login');
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: error.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
   
     return (
       <Flex minH="100vh" bgGradient="linear(to-br, #1a365d, #2a4365, #2c5282)" overflow="hidden">
@@ -112,7 +216,7 @@ import {
                 </Text>
               </Box>
   
-              <VStack spacing={6} w="full">
+              <VStack spacing={6} w="full" as="form" onSubmit={handleSignUp}>
                 <Flex w="full" gap={4}>
                   <InputGroup size="lg">
                     <Input
@@ -131,6 +235,7 @@ import {
                         borderColor: 'teal.300',
                       }}
                       transition="all 0.3s"
+                      isDisabled={isLoading}
                     />
                   </InputGroup>
 
@@ -151,6 +256,7 @@ import {
                         borderColor: 'teal.300',
                       }}
                       transition="all 0.3s"
+                      isDisabled={isLoading}
                     />
                   </InputGroup>
                 </Flex>
@@ -172,6 +278,7 @@ import {
                       borderColor: 'teal.300',
                     }}
                     transition="all 0.3s"
+                    isDisabled={isLoading}
                   />
                 </InputGroup>
   
@@ -192,6 +299,7 @@ import {
                       borderColor: 'teal.300',
                     }}
                     transition="all 0.3s"
+                    isDisabled={isLoading}
                   />
                   <InputRightElement width="4.5rem">
                     <Button
@@ -224,6 +332,7 @@ import {
                       borderColor: 'teal.300',
                     }}
                     transition="all 0.3s"
+                    isDisabled={isLoading}
                   />
                 </InputGroup>
   
@@ -241,6 +350,9 @@ import {
                   }}
                   animation={glowAnimation}
                   transition="all 0.3s"
+                  onClick={handleSignUp}
+                  isLoading={isLoading}
+                  loadingText="Creating Account..."
                 >
                   Sign Up
                 </Button>
@@ -259,6 +371,7 @@ import {
                   size="lg"
                   width="full"
                   leftIcon={<FaGoogle />}
+                  isDisabled={isLoading}
                   as={motion.button}
                   whileHover={{ scale: 1.02, boxShadow: "0 0 15px rgba(49, 151, 149, 0.3)" }}
                   whileTap={{ scale: 0.98 }}

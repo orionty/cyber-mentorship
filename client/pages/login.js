@@ -12,13 +12,14 @@ import {
   InputRightElement,
   Container,
   Image,
-} from '@chakra-ui/react';
-import { keyframes } from '@emotion/react';
-import { motion } from 'framer-motion';
-import { useGoogleLogin } from '@react-oauth/google';
-import { useState } from 'react';
-import { FaGoogle, FaEye, FaEyeSlash, FaHome } from 'react-icons/fa';
-import { useRouter } from 'next/router';
+} from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
+import { motion } from "framer-motion";
+import { useGoogleLogin } from "@react-oauth/google";
+import { useState } from "react";
+import { FaGoogle, FaEye, FaEyeSlash, FaHome } from "react-icons/fa";
+import { useRouter } from "next/router";
+import { useToast } from "@chakra-ui/react";
 
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
@@ -31,29 +32,110 @@ const glowKeyframes = keyframes`
 
 const LoginPage = () => {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const textColor = useColorModeValue('gray.600', 'gray.200');
-  const primaryColor = useColorModeValue('teal.500', 'teal.300');
+  const bgColor = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.600", "gray.200");
+  const primaryColor = useColorModeValue("teal.500", "teal.300");
   const glowAnimation = `${glowKeyframes} 2s infinite`;
 
   const handleGoogleLogin = useGoogleLogin({
-    onSuccess: (response) => console.log('Google login success:', response),
-    onError: () => console.log('Google login error'),
+    onSuccess: (response) => console.log("Google login success:", response),
+    onError: () => console.log("Google login error"),
   });
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    // Validation
+    if (!email || !password) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Store token and user data
+      localStorage.setItem("token",  data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      toast({
+        title: "Success",
+        description: "Logged in successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
+      // Redirect to dashboard or home page
+      router.push("/"); // or wherever you want to redirect after login
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <Flex minH="100vh" bgGradient="linear(to-br, #1a365d, #2a4365, #2c5282)" overflow="hidden">
+    <Flex
+      minH="100vh"
+      bgGradient="linear(to-br, #1a365d, #2a4365, #2c5282)"
+      overflow="hidden"
+    >
       {/* Home Button */}
       <Button
         position="absolute"
         top={4}
         left={4}
         leftIcon={<FaHome />}
-        onClick={() => router.push('/')}
+        onClick={() => router.push("/")}
         colorScheme="teal"
         variant="solid"
         size="md"
@@ -64,22 +146,25 @@ const LoginPage = () => {
 
       {/* Left Section - Login Form */}
       <MotionFlex
-        w={{ base: '100%', md: '50%' }}
+        w={{ base: "100%", md: "50%" }}
         p={{ base: 8, md: 20 }}
         direction="column"
         justify="center"
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.7 }}
-        bg={useColorModeValue('rgba(255, 255, 255, 0.95)', 'rgba(26, 32, 44, 0.95)')}
+        bg={useColorModeValue(
+          "rgba(255, 255, 255, 0.95)",
+          "rgba(26, 32, 44, 0.95)"
+        )}
         backdropFilter="blur(20px)"
-        borderRadius={{ base: 'none', md: '3xl' }}
+        borderRadius={{ base: "none", md: "3xl" }}
         m={{ base: 0, md: 8 }}
         boxShadow="2xl"
         position="relative"
         _before={{
           content: '""',
-          position: 'absolute',
+          position: "absolute",
           top: -2,
           left: -2,
           right: -2,
@@ -95,7 +180,7 @@ const LoginPage = () => {
           <VStack spacing={8} align="start" w="full">
             <Box>
               <Heading
-                fontSize={{ base: '3xl', md: '4xl' }}
+                fontSize={{ base: "3xl", md: "4xl" }}
                 bgGradient="linear(to-r, teal.400, blue.500)"
                 bgClip="text"
                 letterSpacing="tight"
@@ -109,44 +194,49 @@ const LoginPage = () => {
               </Text>
             </Box>
 
-            <VStack spacing={6} w="full">
+            <VStack spacing={6} w="full" as="form" onSubmit={handleLogin}>
               <InputGroup size="lg">
                 <Input
                   placeholder="Enter email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   size="lg"
-                  bg={useColorModeValue('white', 'gray.700')}
+                  bg={useColorModeValue("white", "gray.700")}
                   border="2px solid"
-                  borderColor={useColorModeValue('teal.100', 'teal.700')}
+                  borderColor={useColorModeValue("teal.100", "teal.700")}
                   _focus={{
-                    borderColor: 'teal.400',
-                    boxShadow: '0 0 0 1px teal.400',
+                    borderColor: "teal.400",
+                    boxShadow: "0 0 0 1px teal.400",
                   }}
                   _hover={{
-                    borderColor: 'teal.300',
+                    borderColor: "teal.300",
                   }}
                   transition="all 0.3s"
+                  isDisabled={isLoading}
+                  type="email"
+                  required
                 />
               </InputGroup>
 
               <InputGroup size="lg">
                 <Input
                   placeholder="Enter password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  bg={useColorModeValue('white', 'gray.700')}
+                  bg={useColorModeValue("white", "gray.700")}
                   border="2px solid"
-                  borderColor={useColorModeValue('teal.100', 'teal.700')}
+                  borderColor={useColorModeValue("teal.100", "teal.700")}
                   _focus={{
-                    borderColor: 'teal.400',
-                    boxShadow: '0 0 0 1px teal.400',
+                    borderColor: "teal.400",
+                    boxShadow: "0 0 0 1px teal.400",
                   }}
                   _hover={{
-                    borderColor: 'teal.300',
+                    borderColor: "teal.300",
                   }}
                   transition="all 0.3s"
+                  isDisabled={isLoading}
+                  required
                 />
                 <InputRightElement width="4.5rem">
                   <Button
@@ -155,7 +245,8 @@ const LoginPage = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     variant="ghost"
                     color="teal.500"
-                    _hover={{ bg: 'teal.50' }}
+                    _hover={{ bg: "teal.50" }}
+                    isDisabled={isLoading}
                   >
                     <Icon as={showPassword ? FaEyeSlash : FaEye} />
                   </Button>
@@ -168,7 +259,10 @@ const LoginPage = () => {
                 width="full"
                 fontSize="md"
                 as={motion.button}
-                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(49, 151, 149, 0.5)" }}
+                whileHover={{
+                  scale: 1.02,
+                  boxShadow: "0 0 20px rgba(49, 151, 149, 0.5)",
+                }}
                 whileTap={{ scale: 0.98 }}
                 bgGradient="linear(to-r, teal.400, teal.500)"
                 _hover={{
@@ -176,16 +270,32 @@ const LoginPage = () => {
                 }}
                 animation={glowAnimation}
                 transition="all 0.3s"
+                type="submit"
+                isLoading={isLoading}
+                loadingText="Signing in..."
               >
                 Sign in
               </Button>
 
               <Flex align="center" w="full">
-                <Box flex={1} h="1px" bgGradient="linear(to-r, transparent, teal.200, transparent)" />
-                <Text px={3} color={textColor} fontSize="sm" fontWeight="medium">
+                <Box
+                  flex={1}
+                  h="1px"
+                  bgGradient="linear(to-r, transparent, teal.200, transparent)"
+                />
+                <Text
+                  px={3}
+                  color={textColor}
+                  fontSize="sm"
+                  fontWeight="medium"
+                >
                   or continue with
                 </Text>
-                <Box flex={1} h="1px" bgGradient="linear(to-r, transparent, teal.200, transparent)" />
+                <Box
+                  flex={1}
+                  h="1px"
+                  bgGradient="linear(to-r, transparent, teal.200, transparent)"
+                />
               </Flex>
 
               <Button
@@ -195,33 +305,37 @@ const LoginPage = () => {
                 width="full"
                 leftIcon={<FaGoogle />}
                 as={motion.button}
-                whileHover={{ scale: 1.02, boxShadow: "0 0 15px rgba(49, 151, 149, 0.3)" }}
+                whileHover={{
+                  scale: 1.02,
+                  boxShadow: "0 0 15px rgba(49, 151, 149, 0.3)",
+                }}
                 whileTap={{ scale: 0.98 }}
                 borderColor="teal.400"
                 color="teal.500"
-                _hover={{ 
-                  bg: useColorModeValue('teal.50', 'rgba(49, 151, 149, 0.1)'),
-                  borderColor: 'teal.500'
+                _hover={{
+                  bg: useColorModeValue("teal.50", "rgba(49, 151, 149, 0.1)"),
+                  borderColor: "teal.500",
                 }}
                 transition="all 0.3s"
+                isDisabled={isLoading}
               >
                 Continue with Google
               </Button>
             </VStack>
 
             <Text color={textColor} fontSize="md" w="full" textAlign="center">
-              Don't have an account?{' '}
+              Don't have an account?{" "}
               <Text
                 as="span"
                 color={primaryColor}
                 cursor="pointer"
                 fontWeight="semibold"
-                _hover={{ 
-                  textDecoration: 'underline',
-                  color: 'teal.400'
+                _hover={{
+                  textDecoration: "underline",
+                  color: "teal.400",
                 }}
                 transition="all 0.3s"
-                onClick={() => router.push('/signup')}
+                onClick={() => router.push("/signup")}
               >
                 Sign up
               </Text>
@@ -232,7 +346,7 @@ const LoginPage = () => {
 
       {/* Right Section - Cybersecurity Background */}
       <MotionBox
-        display={{ base: 'none', md: 'block' }}
+        display={{ base: "none", md: "block" }}
         w="50%"
         h="100vh"
         position="relative"
@@ -280,8 +394,8 @@ const LoginPage = () => {
           maxW="500px"
           w="90%"
         >
-          <Heading 
-            size="2xl" 
+          <Heading
+            size="2xl"
             color="white"
             bgGradient="linear(to-r, teal.200, blue.200)"
             bgClip="text"
@@ -290,7 +404,8 @@ const LoginPage = () => {
             Secure Login
           </Heading>
           <Text fontSize="xl" maxW="md" lineHeight="tall" fontWeight="medium">
-            Experience state-of-the-art security with our advanced authentication system. Your data, your control.
+            Experience state-of-the-art security with our advanced
+            authentication system. Your data, your control.
           </Text>
         </VStack>
       </MotionBox>
