@@ -64,7 +64,7 @@ const NewsletterSignupSection = () => {
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            Stay Updated with CyberMentorship!
+            Stay Updated with Cyber1Mentorship!
           </MotionHeading>
 
           <MotionText

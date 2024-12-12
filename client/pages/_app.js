@@ -1,7 +1,5 @@
 import { ChakraProvider } from "@chakra-ui/react"
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { ConfettiProvider } from '@/components/providers/confetti-provider'
-import { ToasterProvider } from '@/components/providers/toaster-provider'
 import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
@@ -12,12 +10,11 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <>
-      <ToasterProvider />
+      
       <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
         <ChakraProvider>
-          <ConfettiProvider>
             <Component {...pageProps} />
-          </ConfettiProvider>
+         
         </ChakraProvider>
       </GoogleOAuthProvider>
     </>

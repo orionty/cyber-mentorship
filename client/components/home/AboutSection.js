@@ -151,7 +151,7 @@ const AboutSection = () => {
                       bgGradient="linear(to-r, teal.500, cyan.600)"
                       bgClip="text"
                     >
-                      CyberMentorship
+                      Cyber1Mentorship
                     </Text>
                   </Heading>
                   <Text
@@ -159,7 +159,7 @@ const AboutSection = () => {
                     color={textColor}
                     lineHeight="tall"
                   >
-                    CyberMentorship is committed to empowering future cybersecurity
+                    Cyber1Mentorship is committed to empowering future cybersecurity
                     professionals by connecting them with industry-leading mentors, offering
                     hands-on learning opportunities, and providing resources for career
                     advancement.

@@ -86,7 +86,7 @@ const Footer = () => {
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                CyberMentorship
+                Cyber1Mentorship
               </MotionText>
               <Text fontSize="sm" color="gray.300" maxW="sm" lineHeight="tall">
                 Empowering the next generation of cybersecurity professionals through mentorship and career guidance.
@@ -102,7 +102,7 @@ const Footer = () => {
                 </Flex>
                 <Flex align="center">
                   <Icon as={FaEnvelope} mr={2} color="teal.200" />
-                  <Link href="mailto:contact@cybermentorship.com">contact@cybermentorship.com</Link>
+                  <Link href="mailto:contact@Cyber1Mentorship.com">contact@Cyber1Mentorship.com</Link>
                 </Flex>
               </VStack>
             </VStack>
@@ -251,7 +251,7 @@ const Footer = () => {
           gap={4}
         >
           <Text fontSize="sm" color="gray.400">
-            &copy; {new Date().getFullYear()} CyberMentorship. All rights reserved.
+            &copy; {new Date().getFullYear()} Cyber1Mentorship. All rights reserved.
           </Text>
           <HStack spacing={6} color="gray.400" fontSize="sm">
             <MotionLink 

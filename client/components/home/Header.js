@@ -156,7 +156,7 @@ const Header = () => {
             transition={{ duration: 0.5 }}
           >
             <Text as="span" color="yellow.400">
-              Cyber
+              Cyber1
             </Text>
             Mentorship
           </MotionFlex>

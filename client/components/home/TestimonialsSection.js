@@ -14,7 +14,7 @@ const TestimonialsSection = () => {
   const testimonials = [
     {
       title: "Empowering Journey",
-      content: "The mentorship program at CyberMentorship has been transformative. I've gained invaluable insights and practical skills that have accelerated my career in cybersecurity.",
+      content: "The mentorship program at Cyber1Mentorship has been transformative. I've gained invaluable insights and practical skills that have accelerated my career in cybersecurity.",
       author: "Sarah Lee",
       role: "Cybersecurity Analyst",
       rating: 5,
@@ -30,7 +30,7 @@ const TestimonialsSection = () => {
     },
     {
       title: "Career Catalyst",
-      content: "Thanks to the guidance and resources provided by CyberMentorship, I secured my dream job in the cybersecurity field. The personalized mentorship was key to my success.",
+      content: "Thanks to the guidance and resources provided by Cyber1Mentorship, I secured my dream job in the cybersecurity field. The personalized mentorship was key to my success.",
       author: "Emily Johnson",
       role: "Cybersecurity Consultant",
       rating: 5,
@@ -78,7 +78,7 @@ const TestimonialsSection = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
             >
-              Hear from our mentors and mentees about their transformative experiences with CyberMentorship.
+              Hear from our mentors and mentees about their transformative experiences with Cyber1Mentorship.
             </MotionText>
             <Flex>
               <IconButton

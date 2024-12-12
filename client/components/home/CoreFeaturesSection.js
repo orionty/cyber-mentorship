@@ -104,7 +104,7 @@ const CoreFeaturesSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          Core Features of CyberMentorship
+          Core Features of Cyber1Mentorship
         </MotionHeading>
         <MotionBox
           ref={ref}
